@@ -1,0 +1,39 @@
+# WebDecode
+
+- **Platform:** picoCTF 2024
+- **Difficulty:** Easy
+- **Date completed:** 2026-10-14
+- **Category:** Web
+
+## Summary
+A web inspector challenge where the flag was hidden as a Base64-encoded value inside the page's source, buried on a page an F12 inspection alone wouldn't have surfaced quickly.
+
+## Steps
+1. Pressed F12 to open dev tools first — nothing obviously stood out on inspection.
+2. Pulled the raw source with `curl` instead, to get the full picture across every page at once.
+3. The site had three tabs: Home, About, and Contact. Home and Contact looked clean.
+4. On the About page, found a suspicious attribute not present anywhere else on the site:
+   ```
+   notify_true="YWNhZGVteXt3ZWJfc3VjYzNzc2Z1bGx5X2QzYzBkZWRfOWQ3MmE4ZjZ9"
+   ```
+   A string like that isn't something a front-end dev writes by hand — flagged it as encoded data.
+5. Ran it through a hash identifier first — came back with nothing, so it wasn't a hash.
+6. Tried the simplest option, Base64:
+   ```
+   echo "YWNhZGVteXt3ZWJfc3VjYzNzc2Z1bGx5X2QzYzBkZWRfOWQ3MmE4ZjZ9" | base64 -d
+   ```
+7. Decoded straight to the flag.
+
+## Tools used
+- `curl` — pulled raw page source across all three tabs
+- Browser dev tools (F12) — initial inspection
+- `base64 -d` — decoded the hidden string
+- A hash identifier tool — ruled out the string being a hash first
+
+## Lesson learned
+When inspecting the DOM directly doesn't turn up anything, pull the full raw source instead — odd-looking attributes or strings that don't belong in normal markup are worth decoding, and Base64 is always worth trying first since it's instantly recognizable and free to rule out.
+
+## Flag
+```
+academy{web_succ3ssfully_d3c0ded_9d72a8f6}
+```
